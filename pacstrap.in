@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/data/usr/bin/bash
 
 #
 # Assumptions:
@@ -18,7 +18,7 @@ pacman_args=()
 pacmode=-Sy
 unshare=0
 copyconf=0
-pacman_config=/etc/pacman.conf
+pacman_config=/data/etc/pacman.conf
 
 m4_include(common)
 
@@ -52,21 +52,21 @@ pacstrap() {
   # create obligatory directories
   msg 'Creating install root at %s' "$newroot"
   # shellcheck disable=SC2174 # permissions are perfectly fine here
-  mkdir -m 0755 -p "$newroot"/var/{cache/pacman/pkg,lib/pacman,log} "$newroot"/{dev,run,etc/pacman.d}
+  mkdir -m 0755 -p "$newroot"/data/var/{cache/pacman/pkg,lib/pacman,log} "$newroot"/data/etc/pacman.d "$newroot"/dev
   # shellcheck disable=SC2174 # permissions are perfectly fine here
-  mkdir -m 1777 -p "$newroot"/tmp
+  # mkdir -m 1777 -p "$newroot"/tmp
   # shellcheck disable=SC2174 # permissions are perfectly fine here
   mkdir -m 0555 -p "$newroot"/{sys,proc}
 
   # mount API filesystems
   $setup "$newroot" || die "failed to setup chroot %s" "$newroot"
 
-  if [[ ! -d $newroot/etc/pacman.d/gnupg ]]; then
+  if [[ ! -d $newroot/data/etc/pacman.d/gnupg ]]; then
     if (( initkeyring )); then
-      pacman-key --gpgdir "$newroot"/etc/pacman.d/gnupg --init
-    elif (( copykeyring )) && [[ -d /etc/pacman.d/gnupg ]]; then
+      pacman-key --gpgdir "$newroot"/data/etc/pacman.d/gnupg --init
+    elif (( copykeyring )) && [[ -d /data/etc/pacman.d/gnupg ]]; then
       # if there's a keyring on the host, copy it into the new root
-      cp -a --no-preserve=ownership /etc/pacman.d/gnupg "$newroot/etc/pacman.d/"
+      cp -a --no-preserve=ownership /data/etc/pacman.d/gnupg "$newroot/data/etc/pacman.d/"
     fi
   fi
 
@@ -77,11 +77,11 @@ pacstrap() {
 
   if (( copymirrorlist )); then
     # install the host's mirrorlist onto the new root
-    cp -a /etc/pacman.d/mirrorlist "$newroot/etc/pacman.d/"
+    cp -a /data/etc/pacman.d/mirrorlist "$newroot/data/etc/pacman.d/"
   fi
 
   if (( copyconf )); then
-    cp -a "$pacman_config" "$newroot/etc/pacman.conf"
+    cp -a "$pacman_config" "$newroot/data/etc/pacman.conf"
   fi
 }
 
@@ -141,7 +141,7 @@ shift
 pacman_args+=("$pacmode" "${@:-base}" --config="$pacman_config")
 
 if (( ! hostcache )); then
-  pacman_args+=(--cachedir="$newroot/var/cache/pacman/pkg")
+  pacman_args+=(--cachedir="$newroot/data/var/cache/pacman/pkg")
 fi
 
 if (( ! interactive )); then

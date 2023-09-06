@@ -1,6 +1,6 @@
 VER=26
 
-PREFIX = /usr/local
+PREFIX = /data/usr/local
 
 BINPROGS = \
 	arch-chroot \

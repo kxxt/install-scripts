@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/data/usr/bin/bash
 
 shopt -s extglob
 
@@ -50,8 +50,8 @@ chroot_add_resolv_conf() {
   local src
   local dest
 
-  src=$(resolve_link /etc/resolv.conf)
-  dest=$(resolve_link "$chrootdir/etc/resolv.conf" "$chrootdir")
+  src=$(resolve_link /data/etc/resolv.conf)
+  dest=$(resolve_link "$chrootdir/data/etc/resolv.conf" "$chrootdir")
 
   # If we don't have a source resolv.conf file, there's nothing useful we can do.
   [[ -e $src ]] || return 0
@@ -69,7 +69,7 @@ chroot_add_resolv_conf() {
     #      creating a dummy file at the target, so that we have something to bind to.
 
     # Case 1.
-    [[ $dest = $chrootdir/etc/resolv.conf ]] && return 0
+    [[ $dest = $chrootdir/data/etc/resolv.conf ]] && return 0
 
     # Case 2.
     install -Dm644 /dev/null "$dest" || return 1
@@ -95,7 +95,7 @@ arch-chroot() {
   chroot_args=()
   [[ $userspec ]] && chroot_args+=(--userspec "$userspec")
 
-  SHELL=/bin/bash $pid_unshare chroot "${chroot_args[@]}" -- "$chrootdir" "${args[@]}"
+  SHELL=/data/usr/bin/bash $pid_unshare chroot "${chroot_args[@]}" -- "$chrootdir" "${args[@]}"
 }
 
 while getopts ':hNu:r' flag; do
